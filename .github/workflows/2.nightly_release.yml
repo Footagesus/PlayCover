@@ -15,51 +15,27 @@ jobs:
               uses: actions/checkout@v6
 
             - name: Install dependencies
-              shell: bash
               run: |
-                  brew install swiftlint
-                  gem install fastlane
-                  bundle install
-                  pip install setuptools
+                  brew install carthage swiftlint
                   npm install https://github.com/PlayCover/create-dmg
 
-            - name: Set build number
-              shell: bash
+            - name: Fetch Carthage dependencies
               run: |
-                  fastlane run increment_build_number build_number:${{ github.run_number }}
+                  carthage update --use-xcframeworks
 
-            - name: Fastlane Nightly
-              shell: bash
-              run: fastlane nightly
-              env:
-                  MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
-                  MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-                  FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: 120 # x86 is slooooooow
-
-            - name: Extract API_KEY
-              shell: bash
-              run: 'echo "$API_KEY" > apikey.json'
-              env:
-                  API_KEY: ${{secrets.APPLE_API_KEY_JSON}}
-
-            - name: Create DMG
-              shell: bash
+            - name: Build
               run: |
-                  npx create-dmg ./output/PlayCover.app ./output
-                  mv ./output/*.dmg ./output/PlayCover_nightly_${{ github.run_number }}.dmg
+                  xcodebuild \
+                    -project PlayCover.xcodeproj \
+                    -scheme PlayCover \
+                    -configuration Nightly \
+                    -derivedDataPath build \
+                    CODE_SIGNING_ALLOWED=NO \
+                    CODE_SIGNING_REQUIRED=NO \
+                    CODE_SIGN_IDENTITY="" \
+                    build
 
-            - name: Notarize DMG
-              continue-on-error: true
-              shell: bash
-              run: |
-                  fastlane notarize_dmg package:output/PlayCover_nightly_${{ github.run_number }}.dmg
-
-            - name: Clean Up
-              shell: bash
-              run: rm apikey.json
-
-            - name: Upload Artifact
-              uses: actions/upload-artifact@v7
+            - uses: actions/upload-artifact@v4
               with:
-                  name: PlayCover_nightly_${{ github.run_number }}.dmg
-                  path: output/PlayCover_nightly_${{ github.run_number }}.dmg
+                  name: PlayCover.app
+                  path: build/Build/Products/Nightly/PlayCover.app
