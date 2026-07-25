@@ -58,8 +58,7 @@ lane :nightly do
     export_method: "developer-id",
     destination: "generic/platform=macOS",
     skip_package_pkg: true,
-    skip_codesigning: true,
-    xcargs: "FASTLANE=1 CODE_SIGN_IDENTITY=\"\" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO",
+    xcargs: "FASTLANE=1 CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=YES CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM=",
   )
 end
 
