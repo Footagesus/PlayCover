@@ -39,7 +39,8 @@ jobs:
             - name: Show full gym log on failure
               if: failure()
               shell: bash
-              run: cat /Users/runner/Library/Logs/gym/PlayCover-PlayCover.log
+              run: |
+                  grep -n -B5 -A 30 "Codesign sparkle\|Signing identity\|no identity found\|EXPANDED_CODE_SIGN_IDENTITY" /Users/runner/Library/Logs/gym/PlayCover-PlayCover.log
 
             - name: Extract API_KEY
               shell: bash
