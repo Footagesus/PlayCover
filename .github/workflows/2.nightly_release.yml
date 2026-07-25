@@ -36,6 +36,10 @@ jobs:
                   MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
                   FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: 120 # x86 is slooooooow
 
+            - name: Re-sign app bundle ad-hoc (fix Team ID mismatch)
+              shell: bash
+              run: codesign --force --deep --sign - ./output/PlayCover.app
+
             - name: Show full gym log on failure
               if: failure()
               shell: bash
