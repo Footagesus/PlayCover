@@ -51,7 +51,7 @@ jobs:
             - name: Create DMG
               shell: bash
               run: |
-                  npx create-dmg ./output/PlayCover.app ./output
+                  npx create-dmg --no-code-sign ./output/PlayCover.app ./output
                   mv ./output/*.dmg ./output/PlayCover_nightly_${{ github.run_number }}.dmg
 
             - name: Notarize DMG
